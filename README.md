@@ -1,6 +1,6 @@
 # MessageService
 
-All the code needed to provision and deploy a service that serves an HTML containing a dynamic string which can be changed without redeploying.
+All the code needed to provision and deploy a service that serves an HTML page containing a dynamic string which can be changed without redeploying.
 
 ## Components
 
