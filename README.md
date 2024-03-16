@@ -1,4 +1,4 @@
-# MessageService (for DevOps technical challenge)
+# MessageService
 
 All the code needed to provision and deploy a service that serves an HTML containing a dynamic string which can be changed without redeploying.
 
@@ -17,7 +17,8 @@ All the code needed to provision and deploy a service that serves an HTML contai
 * Ansible
 
 **N.B.** The AWS CLI environment needs to be set up and configured for the AWS account that's being used.
-## Local development of MessageService Python application
+
+## MessageService Python application
 
 ### Local development
 
