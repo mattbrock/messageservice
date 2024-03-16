@@ -1,0 +1,6 @@
+---
+
+- import_tasks: rsyslog.yml
+- import_tasks: systemdreload.yml
+- import_tasks: service.yml
+- import_tasks: nginx.yml

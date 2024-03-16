@@ -1,0 +1,54 @@
+---
+
+- name: install pip
+  dnf:
+    name: python3-pip
+    state: present
+    
+- name: install python requirements
+  pip:
+    name:
+      - Jinja2
+      - MarkupSafe
+
+- name: make www dir
+  file:
+    path: /var/www
+    state: directory
+    owner: nginx
+    group: nginx
+
+- name: copy index.html to www dir
+  copy:
+    src: index.html
+    dest: /var/www/index.html
+    owner: nginx
+    group: nginx
+
+- name: detect if message file exists
+  stat:
+    path: /var/www/message.dat
+  register: messagefile
+
+- name: copy message file to www dir
+  copy:
+    src: message.dat
+    dest: /var/www/message.dat
+    owner: nginx
+    group: nginx
+  when: not messagefile.stat.exists
+
+- name: copy service definition
+  copy:
+    src: messageservice.service
+    dest: /usr/lib/systemd/system/messageservice.service
+  notify: reload systemd
+
+- name: copy server.py to www dir
+  copy:
+    src: server.py
+    dest: /var/www/server.py
+    owner: nginx
+    group: nginx
+  notify: restart messageservice
+

@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA1Tq4RCFYPr1lojhx3EzmicOPcYmW5ka/nb4KhFcy6R4g5n6cxfogqtw1WThmaUOQBSX5RNpALtHvvmYkjOa/DWqD54l8k0XNtzUhJelaH/u9393KuQma/bEBOLBqXPppZb2CITp75i+hUweT2tdJiLV8ofkyrDcxTKtXGa6i1RX+lKA+IJSpg1+Tbvo63kwcQKUnyXiZAPlvKaVYia0Wig17+57o2IPMw3fDplSPX5ODBwp7uVPYSmKhXISW9p2cPkJGlgVAeFMem5EgkNxtqq8wbLnE64J9++ctow7PKCUpQWbm7QWkdgPsf/ERL+NLSbUfNbq6pGI1pNL2HRQ9Vw== matt" >> /home/ec2-user/.ssh/authorized_keys

@@ -1,0 +1,16 @@
+[Unit]
+Description=MessageService
+After=network-online.target
+
+[Service]
+Type=simple
+User=nginx
+WorkingDirectory=/var/www
+ExecStart=/bin/python3 -u /var/www/server.py
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=messageservice
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

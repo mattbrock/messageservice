@@ -1,0 +1,14 @@
+---
+
+- name: install nginx
+  dnf:
+    name: nginx
+    state: present
+  notify: start/reload nginx
+
+- name: copy nginx.conf
+  copy:
+    src: "nginx.conf"
+    dest: /etc/nginx/nginx.conf
+    backup: yes
+  notify: start/reload nginx

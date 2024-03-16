@@ -1,0 +1,7 @@
+---
+
+- name: install rsyslog
+  dnf:
+    name: rsyslog
+    state: present
+  notify: enable/start rsyslog

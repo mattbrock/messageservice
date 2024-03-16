@@ -1,0 +1,7 @@
+---
+
+- name: restart messageservice
+  service:
+    name: messageservice
+    enabled: yes
+    state: restarted
