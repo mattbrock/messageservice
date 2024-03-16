@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp index.html message.dat server.py ../ansible/roles/messageservice/files
+cp -v index.html server.py ../ansible/roles/messageservice/files
