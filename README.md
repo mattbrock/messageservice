@@ -18,7 +18,8 @@ This solution was developed in a response to a specific technical challenge, but
 * Terraform
 * Ansible
 
-**N.B.** The AWS CLI environment needs to be set up and configured for the AWS account that's being used.
+**N.B.** The AWS CLI environment needs to be set up and configured for the AWS account that's being used. See [Amazon's documentation](https://aws.amazon.com/cli/) for further information (though if using macOS I would suggest
+installing via [Homebrew](https://brew.sh/) for simplicity, rather than bothering with the separate installer).
 
 ## MessageService Python application
 
