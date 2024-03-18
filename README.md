@@ -89,6 +89,9 @@ Significant files:
 * _userdata.sh_ - EC2 user data (used to add public keys for SSH access).
 * _versions.tf_ - Specification for Terraform and provider versions.
 
+**N.B.** Currently there is no Security Group setup or references, so ensure your default Security Group has inbound permissions for SSH, ideally locked to your own IP address for security, and inbound permissions for HTTP.
+You could also add inbound permission for port 8080 locked to your own IP address, if you need to bypass nginx and check the Python app response directly.
+
 If not previously initialised:
 
 ```
