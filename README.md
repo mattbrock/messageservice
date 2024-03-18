@@ -176,6 +176,8 @@ As such I put together the application as a Python app which serves the content 
 
 Another way to solve it might have been to provide an upload mechanism to change the content without redeploying, which could have been written into the app, or uploaded to an S3 bucket, or uploaded via FTP, etc.
 
+There's very little in the way of code comments due to time constraints. With more time, this would be one of the first issues to rectify.
+
 ### Application and API improvements
 
 The API functionality is completely insecure currently, so it should be secured with system of API access keys. The very generic POST request should be developed into a proper API solution with relevant URI paths. The API could also be split off into a separate app and could ultimately be developed into a full admin backend interface. The app could then be run as a separate service which might be useful in terms of managing load on the main web app separately from the admin app, since a busy web application tends to have a different kind of load profile from a backend admin application. To encrypt traffic for improved security, the application could be moved from HTTP to HTTPS with the addition of TLS certificates.
