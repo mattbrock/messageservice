@@ -31,7 +31,7 @@ Significant files:
 
 * _copy-to-ansible.sh_ - to copy changes to Ansible folder for deployment.
 * _index.html_ - main index page with Jinja2 templating for dynamic string.
-* _message.dat_ - file containing dynamic string.
+* _message.dat_ - text file containing dynamic string.
 * _requirements.txt_ - Python requirements (not currently used, but could be useful with a proper code deployment system).
 * _server.py_ - Python application to server content and handle changes to dynamic string.
 
@@ -164,6 +164,22 @@ Change the message (the dynamic string) by supplying the new string in the "mess
 ```
 $ curl -d "message=NEW_MESSAGE_HERE" http://INSTANCE_PUBLIC_DNS/
 Received new message: NEW_MESSAGE_HERE
+```
+
+The message in the dynamic string should now have changed accordingly:
+
+```
+$ curl http://INSTANCE_PUBLIC_DNS/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Message Service</title>
+</head>
+<body>
+  <h1>The saved string is NEW_MESSAGE_HERE</h1>
+</body>
+</html>
+
 ```
 
 ## Current solution, other options, improvements and embellishments
