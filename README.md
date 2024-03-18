@@ -2,6 +2,8 @@
 
 All the code needed to provision and deploy a service that serves an HTML page containing a dynamic string which can be changed without redeploying.
 
+This solution was developed in a response to a specific technical challenge, but it could also serve as a useful starting point for projects generally, bearing in mind the considerations in the discussion points at the bottom of this document for improvements going forward.
+
 ## Components
 
 * Python application "MessageService" in _service_ subfolder, which provides the required application functionality and can be developed locally, then included in a deployment.
@@ -133,7 +135,36 @@ Deploy the whole configuration for "messageservice" role to "messageservice" hos
 ansible-playbook -i messageservice.sh messageservice.yml
 ```
 
+## Testing/usage
+
+Once the whole application is provisioned and deployed, get the public DNS of the instance from `terraform show` or from the EC2 web console.
+
+Check the application is responding correctly:
+
+```
+$ curl http://INSTANCE_PUBLIC_DNS/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Message Service</title>
+</head>
+<body>
+  <h1>The saved string is dynamic string</h1>
+</body>
+</html>
+
+```
+
+Change the message (the dynamic string) by supplying the new string in the "message" data element via a POST request:
+
+```
+$ curl -d "message=NEW_MESSAGE_HERE" http://INSTANCE_PUBLIC_DNS/
+Received new message: NEW_MESSAGE_HERE
+```
+
 ## Current solution, other options, improvements and embellishments
+
+### Current solution
 
 I interpreted this requirement as a web application serving content which can be changed via an admin backend (as per the requirement to change the content without redeploying anything), which has been simplified in such a way that it can be presented as a technical challenge which won't take an unrealistic amount of time to create.
 
@@ -141,29 +172,28 @@ As such I put together the application as a Python app which serves the content 
 
 Another way to solve it might have been to provide an upload mechanism to change the content without redeploying, which could have been written into the app, or uploaded to an S3 bucket, or uploaded via FTP, etc.
 
-The API functionality is completely insecure currently, so it should be secured with system of API access keys. The very generic POST request should be developed into a proper API solution with relevant URI paths. The API could also be split off into a separate app and could ultimately be developed into a full admin backend interface. The app could then be run as a separate service which might be useful in terms of managing load on the main web app separately from the admin app, since a busy web application tends to have a different kind of load profile from a backend admin application.
+### Application and API improvements
 
-Currently everything is in a single repository, and the application is developed locally and then the pertinent files are transferred via a script to the deployment folder to be deployed as part of the Ansible setup. This is fine as a proof of concept but wouldn't work well in an environment with multiple developers, separate development/DevOps teams, etc. So I'd want to split the application code into a separate repository, then it could be pulled direct from GitHub to server instances as needed. To improve on that further, it could be split into multiple repositories for different parts of the app (web frontend, admin backend, etc.), then ultimately could be set up with workflows/pipelines on GitHub Actions or similar to auto-deploy as needed (from push triggers, pull requests, etc. as preferred).
+The API functionality is completely insecure currently, so it should be secured with system of API access keys. The very generic POST request should be developed into a proper API solution with relevant URI paths. The API could also be split off into a separate app and could ultimately be developed into a full admin backend interface. The app could then be run as a separate service which might be useful in terms of managing load on the main web app separately from the admin app, since a busy web application tends to have a different kind of load profile from a backend admin application. To encrypt traffic for improved security, the application could be moved from HTTP to HTTPS with the addition of TLS certificates.
 
-The infrastructure as defined and provisioned by the Terraform configuration is fine as far as it goes. 
+### Repository and deployment improvements
 
+Currently everything is in a single repository, and the application is developed locally and then the pertinent files are transferred via a script to the deployment folder to be deployed as part of the Ansible setup. This is fine as a proof of concept but wouldn't work well in an environment with multiple developers, separate development/DevOps teams, etc. So I'd want to split the application code into a separate repository, then it could be pulled direct from GitHub to server instances as needed. To improve on that further, it could be split into multiple repositories for different parts of the app (web frontend, admin backend, etc.), then ultimately could be set up with workflows/pipelines on GitHub Actions or similar to auto-deploy as needed (from push triggers, pull requests, etc. as needed).
 
-??? SHOW EXAMPLES OF APP IN ACTION ???
+### Infrastructure improvements
 
-## Improvements
+The infrastructure as defined and provisioned by the Terraform configuration is fine as far as it goes. Obvious improvements would be to manage the instance's Security Group via Terraform, and also definition of an SSH keypair for more resilient management. It could also go further and define VPC info, subnet info, etc.
 
-### Terraform
+Depending on the amount of traffic expected, auto-scaling could be set up for the EC2 instances to handle higher load and traffic spikes without incurring unneeded costs by having additional instances sitting there largely unused at quiet times. Using multiple instances would require a load balancer in front of the application to distribute requests across the instances, such as an Application Load Balancer set up within EC2. This could also be expanded to spread instances across multiple Availability Zones for more resiliency.
 
-* Create and use dedicated security group.
-* Specify SSH key.
-* Specify VPC and subnets etc.
-* Separate workspaces.
+### Shared storage/database improvements
+ 
+It would also require that the file containing the dynamic string be readable and writable across all instances, so it could be stored on an S3 bucket or via a shared file system such as NFS or EFS. If the app were expanded further then ultimately the shared string could be placed in a database solution of some kind, for which there are various possibilities to consider such as MySQL or similar, on an instance or managed within RDS (using Aurora if auto-scaling is needed on the database tier), or perhaps MongoDB or DynamoDB if the app does not go beyond the requirement for key/value storage, or even Redis/ElastiCache if in-memory storage is deemed adequate.
 
-### Infrastructure
+If the app were further developers to cope with an environment with multiple developers and separate teams, separate repositories and deployment workflows etc., separate Terraform workspaces would be set up to handle separate environments for development, testing and production in order to keep things safely isolated. Terraform should also have a centralised state/locking setup (e.g. with S3 and DynamoDB) for safe handling of the Terraform state across multiple users.
 
-* TLS.
-* Auto-scaling.
-* Spread across multiple AZs.
-* Load balancer.
-* Put data in database.
 ### Containerisation
+
+Another option for improvement would be to containerise the Python app and nginx proxy, which would allow a more streamlined development flow for developers to build into containers then pull the container image directly into testing or production environments. This could allow for simpler scaling and infrastructure management if the app were further developed into a more complex system of microservices communicating via APIs. To start with a container runtime e.g. Docker could be installed on the EC2 instance, but as it grows it may make more sense for ease of scaling and managing time/costs to use a dedicated service such as ECS, which could be built on EC2 or it may make more sense to consider a serverless solution such as Fargate in order to reduce administrative complexity. If the app was expected to pass a certain level of complexity then a Kubernetes solution could be evaluated.
+
+All of these options do not need to be run on AWS. Other cloud solutions such as GCP and Azure could be considered, as they all have equivalent services to the ones mentioned above.
