@@ -17,7 +17,7 @@ if [ "$1" == "--list" ] ; then
     fi
     ((i=$i+1))
   done
-  echo -en "],\n    \"vars\": {\n      \"service\": \"messageservice\"\n    }\n  }\n}\n"
+  echo -en "],\n    \"vars\": {}\n  }\n}\n"
 
 elif [ "$1" == "--host" ] ; then
 

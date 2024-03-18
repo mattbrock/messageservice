@@ -85,8 +85,8 @@ Need to `cd` to the _terraform_ subdirectory of the _messageservice_ directory.
 Significant files:
 
 * _ec2instance.tf_ - EC2 instance definition.
-* _main.tf_ - AWS settings and Amazon Linux 2023 AMI definition.
-* _userdata.sh_ - EC2 user data (used to add public keys for SSH access).
+* _main.tf_ - AWS settings and Amazon Linux 2023 AMI definition (could be changed to use other Linux distro as preferred).
+* _userdata.sh_ - EC2 user data (used to add public keys for SSH access - modify this to add/remove keys as needed).
 * _versions.tf_ - Specification for Terraform and provider versions.
 
 **N.B.** Currently there is no Security Group setup or references, so ensure your default Security Group has inbound permissions for SSH, ideally locked to your own IP address for security, and inbound permissions for HTTP.
@@ -141,7 +141,7 @@ ansible-playbook -i messageservice.sh messageservice.yml
 
 ## Testing/usage
 
-Once the whole application is provisioned and deployed, get the public DNS of the instance from `terraform show` or from the EC2 web console.
+Once the whole application is provisioned and deployed, get the public DNS of the instance from `terraform show | grep public_dns` or from the EC2 web console.
 
 Check the application is responding correctly:
 
@@ -182,6 +182,17 @@ $ curl http://INSTANCE_PUBLIC_DNS/
 
 ```
 
+## Viewing logs
+
+Logs can be checked by SSHing into the EC2 instance via its public DNS with username "ec2-user" then (via sudo) viewing _/var/log/messages_ (check log lines containing "messageservice) for the application logs, and _/var/log/nginx/access.log_ and _/var/log/nginx/error.log_ for the nginx logs.
+
+Alternatively, view logs via Ansible commands such as the following:
+
+```
+ansible -i messageservice.sh -m shell -a 'grep messageservice /var/log/messages | tail' messageservice
+ansible -i messageservice.sh -m shell -a 'tail /var/log/nginx/*.log' messageservice
+```
+
 ## Current solution, other options, improvements and embellishments
 
 ### Current solution
@@ -207,6 +218,8 @@ Currently everything is in a single repository, and the application is developed
 The infrastructure as defined and provisioned by the Terraform configuration is fine as far as it goes. Obvious improvements would be to manage the instance's Security Group via Terraform, and also definition of an SSH keypair for more resilient management. It could also go further and define VPC info, subnet info, etc.
 
 Depending on the amount of traffic expected, auto-scaling could be set up for the EC2 instances to handle higher load and traffic spikes without incurring unneeded costs by having additional instances sitting there largely unused at quiet times. Using multiple instances would require a load balancer in front of the application to distribute requests across the instances, such as an Application Load Balancer set up within EC2. This could also be expanded to spread instances across multiple Availability Zones for more resiliency.
+
+It would be better if the application were available via a proper DNS name, which could be set up in Route53 and configured via Terraform.
 
 ### Shared storage/database improvements
  
